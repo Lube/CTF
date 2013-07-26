@@ -16,13 +16,16 @@ class Input():
         self.Order = (0,0)
         self.Quit = False
         self.ChangeSignal = False
+        self.Click = False
+        self.Rotate = False
 
     def update(self):
         self.ChangeSignal = False
         self.WalkRun = False
         self.Wait = False
         self.Rotate = False
-
+        self.Click = False
+        self.nSkill = 0
         for anEvent in pygame.event.get():
             if anEvent.type == pygame.KEYDOWN:
                 if anEvent.key in dKey2Dir.keys():
@@ -37,6 +40,12 @@ class Input():
                     self.Wait = True
                 if anEvent.key == K_LCTRL:
                     self.Rotate = True
+                if pygame.mouse.get_pressed()[0]:
+                    self.Click = True
+                if anEvent.key == 'K_1':
+                    self.nSkill = 0
+                if anEvent.key == 'K_2':
+                    self.nSkill = 1
             if anEvent.type == pygame.KEYUP:
                 if anEvent.key in dKey2Dir.keys():
                     self.remove(dKey2Dir[anEvent.key])
@@ -92,3 +101,6 @@ class Input():
         else:
             if abs(mY+cY) > abs(cX+mX):
                 self.facing = UP
+
+
+

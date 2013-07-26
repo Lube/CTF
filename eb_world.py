@@ -6,7 +6,7 @@ from eb_char import *
 from eb_input import *
 from eb_camera import *
 from eb_render import *
-
+from eb_skillshot import *
 from pygame.locals import *
 
 RIGHT, UP, LEFT, DOWN = (1,1), (1,-1), (-1,-1), (-1,1)
@@ -14,7 +14,6 @@ NE, SE, NO, SO = (0,-1), (1,0), (-1,0), (0,1)
 
 dFACINGS = {RIGHT:0, DOWN:1, NE:6, NO:3 ,UP:4 ,SE:5 ,SO:2 ,LEFT:7}
 
-#NONE = (0,0)
 FPS = 30
 
 WINDOWWIDTH, WINDOWHEIGHT = 600, 400
@@ -32,7 +31,7 @@ GREEN =     (0  , 160,  50 )
 
 def main():
 
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, Input#aSpriteSheet, unMapa, aCamera, tileList, Commands, aChar, command, Collisionables
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, Input
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -41,12 +40,14 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 36)
     unMapa = Mapa('unMapa.txt')
 
-#------------------------------------------------
+    #--------------------------
+    SkToUse = []
     Chars = []
     Chars.append(DPS((1,1)))
     Chars.append(DPS((3,3)))
     CharSelected = Chars[0]
     #--------------------------
+
     Input = Input()
     aCamera = Camera('STATIC', (0,0))
     aRender = Render(aCamera, DISPLAYSURF)
@@ -54,6 +55,7 @@ def main():
     while not Input.Quit:
         DISPLAYSURF.fill((0,0,0))
         unMapa.draw(aRender)
+
         for char in Chars:
             char.draw(aRender)
         Input.update()
@@ -71,7 +73,6 @@ def main():
             for Char in Chars:
                 if Char.Turno:
                     Char.Play(Char.getPlayAction())
-
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
