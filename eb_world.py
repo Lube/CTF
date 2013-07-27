@@ -16,7 +16,7 @@ dFACINGS = {RIGHT:0, DOWN:1, NE:6, NO:3 ,UP:4 ,SE:5 ,SO:2 ,LEFT:7}
 
 FPS = 30
 
-WINDOWWIDTH, WINDOWHEIGHT = 600, 400
+WINDOWWIDTH, WINDOWHEIGHT = 800, 600
 TILEH, TILEW, GAPSIZE = 32, 64, 1
 BOARDWIDTH = 15
 HALF = WINDOWWIDTH / 2
@@ -30,28 +30,23 @@ GREEN =     (0  , 160,  50 )
 
 
 def main():
-
     global FPSCLOCK, DISPLAYSURF, BASICFONT, Input
-
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('CTF v0.1')
+    #--------------------------
     BASICFONT = pygame.font.Font('freesansbold.ttf', 36)
     unMapa = Mapa('unMapa.txt')
-
-    #--------------------------
     SkToUse = []
     Chars = []
-    Chars.append(DPS((1,1)))
+    Chars.append(DPS((7,6)))
     Chars.append(DPS((3,3)))
     CharSelected = Chars[0]
-    #--------------------------
-
     Input = Input()
     aCamera = Camera('STATIC', (0,0))
     aRender = Render(aCamera, DISPLAYSURF)
-
+    #--------------------------
     while not Input.Quit:
         DISPLAYSURF.fill((0,0,0))
         unMapa.draw(aRender)
@@ -59,6 +54,9 @@ def main():
         for char in Chars:
             char.draw(aRender)
         Input.update()
+
+        if Input.CameraOrder != None:
+            aCamera.update(aCamera.xyTile |x| Input.CameraOrder)
 
         if CharSelected.Fase == FASE_A:
             CharSelected = Chars[(Chars.index(CharSelected)+ 1) % len(Chars)]
@@ -73,6 +71,7 @@ def main():
             for Char in Chars:
                 if Char.Turno:
                     Char.Play(Char.getPlayAction())
+
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -107,13 +106,13 @@ class spritesheet(object):
                 for x in range(image_count)]
         return self.images_at(tups, colorkey)
 
-
 def makeText(text, color, bgcolor, top, left):
     # create the Surface and Rect objects for some text.
     textSurf = BASICFONT.render(text, True, color, bgcolor)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
+
 
 if __name__ == '__main__':
     main()

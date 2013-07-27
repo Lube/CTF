@@ -11,6 +11,10 @@ HALF = WINDOWWIDTH / 2
 HTILEH = 0.5 * TILEH
 HTILEW = 0.5 * TILEW
 
+PHEIGHT = 16 
+PHHEIGHT = 8 
+PHWIDTH = 16
+
 
 class Render():
 
@@ -18,13 +22,17 @@ class Render():
         self.Camera = aCamera
         self.Surface = aSurface
 
-    def drawPlaceHolder(self, color, Col, Fila, aCamera = 0):
+    def drawPlaceHolder(self, color, Col, Fila, aCamera = 0, source = 'terreno'):
         if aCamera == 0:
             aCamera = self.Camera
         Y = (Col + Fila) * HTILEH + 32 - aCamera.y
         X = HALF + (Col*HTILEW) - (Fila*HTILEW) - aCamera.x
-
-        pygame.draw.polygon(self.Surface, color, [(X,Y),(X+HTILEW,Y+HTILEH),(X,Y+TILEH),(X-HTILEW, Y+HTILEH)])
+        
+        if source == 'terreno':
+            pygame.draw.polygon(self.Surface, color, [(X,Y),(X+HTILEW,Y+HTILEH),(X,Y+TILEH),(X-HTILEW, Y+HTILEH)])
+        else:
+            pygame.draw.polygon(self.Surface, color, [(X,Y),(X+PHWIDTH,Y+PHHEIGHT),(X,Y+PHEIGHT),(X-PHWIDTH, Y+PHHEIGHT)])
+        
 
     def drawSprite(self, sprite, Col, Fila, aCamera = 0):
         if aCamera == 0:

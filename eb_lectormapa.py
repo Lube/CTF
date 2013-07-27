@@ -3,6 +3,7 @@
 # Copyright (C) 2012  EGGBREAKER <eggbreaker@live.com.ar>
 
 import math
+from pygame import rect
 from eb_render import Render
 
 dClavesMapa = {'#':0,
@@ -40,8 +41,28 @@ class Mapa:
         self.fil = len(self.mapa)
         self.col = len(self.mapa[0])
         
-    def pos(self, (PosX, PosY)):
-        if self.mapa[math.trunc(PosX)][math.trunc(PosY)] == 0:
+    def rectColission(self, ((left,top),(width,height   ))):
+       
+        if self.mapa[int(left)][int(top)] == 1:
+           # print "TOPLEFT"
+           # print "(",left, top,"),"
+           # print "(",int(left), int(top),"),"
+            return True
+        if self.mapa[int(left)][int(top + height)] == 1:
+            #print "BOTLEFT"
+            #print "(",left,(top + height),")"
+            #print "(",int(left), int(top + height), ")"
+            #print  self.mapa[int(left)][int(top + height)]
+            return True
+        if self.mapa[int(left + width)][int(top)] == 1:
+            #print "TOPRIGHT"
+            #print "(",(left + width),top,")"
+            #print "(",int(left + width),int(top),")"
+            return True
+        if self.mapa[int(left + width)][int(top + height)] == 1:
+            #print "BOTRIGHT"
+            #print "(",(left + width),(top + height),")"
+            #print "(",int(left + width), int(top + height),")"
             return True
         return False
     

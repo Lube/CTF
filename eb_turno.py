@@ -4,8 +4,6 @@
 
 from eb_lectormapa import Mapa
 
-#class ActionFactory(object):
-
 class Action():
     pass
 
@@ -28,13 +26,11 @@ class Run(Action):
 
 class Wait(Action):
     Pos = (0,0)
-
     def __init__(self, Pos):
         self.Pos = Pos
 
     def play(self, aChar):
         aChar.Posicion = self.Pos
-
 
 
 
