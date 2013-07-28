@@ -21,6 +21,7 @@ class Input():
         self.ChangeSignal = False
         self.Click = False
         self.Rotate = False
+        self.nSkill = None
 
     def update(self):
         self.ChangeSignal = False
@@ -28,7 +29,7 @@ class Input():
         self.Wait = False
         self.Rotate = False
         self.Click = False
-        self.nSkill = 0
+        self.nSkill = None
         for anEvent in pygame.event.get():
             if anEvent.type == pygame.KEYDOWN:
                 if anEvent.key in dKey2Dir.keys():
@@ -45,9 +46,9 @@ class Input():
                     self.Rotate = True
                 if pygame.mouse.get_pressed()[0]:
                     self.Click = True
-                if anEvent.key == 'K_1':
+                if anEvent.key == K_1:
                     self.nSkill = 0
-                if anEvent.key == 'K_2':
+                if anEvent.key == K_2:
                     self.nSkill = 1
 
             if anEvent.type == pygame.KEYUP:
@@ -67,7 +68,6 @@ class Input():
                     self.CameraOrder = UP
                 else:
                     self.CameraOrder = None
-        print self.mouse()
 
 
     def updateOrder(self):
@@ -120,8 +120,12 @@ class Input():
         return COL, FILA
 
     def mouseDirection(self, char):
-        cX, cY = char.posicion
+        cX, cY = char.Posicion
         mX, mY = self.mouse()
+        if mX == None:
+            mX = 0
+        if mY == None:
+            mY = 0
         if mX > cX:
             if abs(mX+cX) > abs(cY+mY):
                 self.facing = RIGHT
@@ -134,6 +138,7 @@ class Input():
         else:
             if abs(mY+cY) > abs(cX+mX):
                 self.facing = UP
+        return self.facing
 
 def CoordsToTiles(X,Y):
     FILA = (Y - 32 - (X*TILEH/TILEW) + (HALF*TILEH/TILEW)) / HTILEH / 2

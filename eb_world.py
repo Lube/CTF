@@ -6,7 +6,6 @@ from eb_char import *
 from eb_input import *
 from eb_camera import *
 from eb_render import *
-from eb_skillshot import *
 from pygame.locals import *
 
 RIGHT, UP, LEFT, DOWN = (1,1), (1,-1), (-1,-1), (-1,1)
@@ -53,6 +52,7 @@ def main():
 
         for char in Chars:
             char.draw(aRender)
+            
         Input.update()
 
         if Input.CameraOrder != None:
@@ -63,6 +63,16 @@ def main():
 
         if CharSelected.Fase == FASE_P:
             CharSelected.update(Input, unMapa)
+            if CharSelected.acSkill != None:
+                if not CharSelected.acSkill.locked:
+                    CharSelected.acSkill.update(CharSelected.acSkill.avPatterns[0])
+                    for tile in CharSelected.acSkill.Pattern:
+                        tile = (tile |x| aCamera.xyTile) |x| (-2, -2)
+                        aRender.drawPlaceHolder(RED, tile[0], tile[1], 0, 'personaje')
+                else:
+                    addAction(CharSelected.Turno, selectedSkill, (Input, aChar))
+                    CharSelected.acSkill = None        
+            
 
         if all(map(lambda x: x.Fase == FASE_A, Chars)):
             if all(map(lambda x: not x.Turno, Chars)):
@@ -101,7 +111,7 @@ class spritesheet(object):
         return [self.image_at(rect, colorkey) for rect in rects]
     # Load a whole strip of images
     def load_strip(self, rect, image_count, colorkey = None):
-        "Loads a strip of images and returns them as a list"
+        "Loads a s2trip of images and returns them as a list"
         tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
                 for x in range(image_count)]
         return self.images_at(tups, colorkey)

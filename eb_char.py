@@ -2,6 +2,12 @@
 # Clase Personaje
 # Copyright (C) 2012  EGGBREAKER <eggbreaker@live.com.ar>
 
+
+RIGHT, UP, LEFT, DOWN = (1,1), (1,-1), (-1,-1), (-1,1)
+NE, SE, NO, SO = (0,-1), (1,0), (-1,0), (0,1)
+
+LINE = 0
+SQR = 1
 ATK_SPEED_DPS = 12
 MOV_SPEED_DPS = 8
 DAMAGE_DPS = 8
@@ -13,11 +19,12 @@ STATE_RUN = 'run'
 COST_RUN = 8
 COST_WALK = 5
 COST_WAIT = 10
-COST_SKILL = 50
+COST_SKILLS = [50,50,50,50]
 WALK_ESC = 0.2
 RUN_ESC = 0.3
 FASE_P = 'planeamiento'
 FASE_A = 'accion'
+
 
 #           R,    G,    B
 BLACK =     (0  , 0  ,  0  )
@@ -29,7 +36,7 @@ import pygame, math
 from eb_render import Render
 from eb_turno import *
 from eb_lectormapa import Mapa
-from eb_skillshot import *
+
 
 class Infix:
     def __init__(self, function):
@@ -49,6 +56,126 @@ x = Infix(lambda a,b:tuple([x+y for x, y in zip(a, b)]))
 
 y = Infix(lambda a,b:tuple([a*y for y in b]))
 
+
+
+
+
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+
+
+
+
+
+class skillshot():
+    """Ataques"""
+    efRate = 0 #rango de efectividad TOTAL (se divide por la cantidad de tiles)
+    disRate = 0 #Cuantos tiles ocupa
+    Pattern = [] #En que forma se castea
+    avPatterns = [] #Patterns disponibles
+    locked = False #estado del skillshot, si locked significa que se ejecuta el pr?ximo turno.
+    PlaceHolderColor = RED
+    def __init__(self, Input, aChar):
+        """inicializar dandole efRate, disRate y avPatterns"""
+        self.Input = Input
+        self.mouse = Input.mouse()
+        self.char = aChar
+        self.facing = Input.mouseDirection(self.char)
+
+        
+    def update(self, pattern):
+        self.Pattern = []
+        if self.mouse == (None, None):
+            self.mouse = (0,0)
+        """pseudo-interfaz del skillshot, event handling"""
+        prev = (0,0)
+        self.facing = self.Input.mouseDirection(self.char)
+        if self.Input.Rotate:
+            #si se toca L_ctrl se gira el skillshot
+            self.rotate()
+
+        if pattern == LINE:
+            #Generar el pattern lineal
+            for i in range(self.disRate):
+                prev= tuple(map(sum, zip(prev, self.facing)))
+                self.Pattern.append(prev)
+
+        if pattern == SQR:
+            #Generar el pattern rectangular
+            """prev = self.Input.mouse()
+            for i in range(self.disRate/2):
+                prev = prev |x| self.facing
+                self.Pattern.append(prev)
+               # print self.Pattern
+            acPattern = self.Pattern
+            for q,y in acPattern:
+                if self.facing in (RIGHT, LEFT):
+                    self.Pattern.append((q,y+1))
+                if self.facing in (UP, DOWN"""
+            self.Pattern.append(self.Input.mouse())
+
+        if self.Input.Click:
+            #Si clickea se confirma el movimiento
+            self.locked = True
+       
+
+
+    def rotate(self):
+        """rotar """
+        if self.facing == RIGHT:
+            self.facing = DOWN
+        if self.facing == DOWN:
+            self.facing = LEFT
+        if self.facing == LEFT:
+            self.facing = UP
+        if self.facing == UP:
+            self.facing = RIGHT
+
+    def draw(self, render):
+        for tile in self.pattern:
+            render.drawPlaceHolder(self.PlaceHolderColor, tile[0], tile[1])
+
+
+class Ray(skillshot):
+    efRate = 100
+    disRate = 4
+    avPatterns = [LINE]
+    pattern = LINE
+
+    def play(self):
+        self.update(pattern, Input)
+
+class Blast(skillshot):
+    efRate = 100
+    disRate = 6
+    avPatterns = [SQR]
+
+    def play(self, aChar):
+        self.update(pattern, Input)
+
+
+
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+
+
+
 class Personaje:
     #AtkSpeed
     #MovSpeed
@@ -63,6 +190,7 @@ class Personaje:
             self.AtkSpeed = AtkSpeed
             self.MovSpeed = MovSpeed
             self.Posicion = Posicion
+            self.acSkill  = None
 
     def getPlayAction(self):
         if self.Turno:
@@ -103,8 +231,11 @@ class Personaje:
         if anInput.Wait:
             self.wait()
 
-        if anInput.nSkill != 0:
-            self.skill(nSkill, anInput)
+        if anInput.nSkill != None:
+            self.skill(anInput.nSkill, anInput)
+
+                    
+
 
 
 
@@ -150,19 +281,14 @@ class Personaje:
         addAction(self.Turno, Run, self.Posicion)
 
     def skill(self, nSkill, Input):
-        selectedSkill = avSkills[nSkill]
-        self.ActionPoints -= COST_SKILL
+        selectedSkill = self.avSkills[nSkill]
+        self.ActionPoints -= COST_SKILLS[nSkill]
         self.acSkill = selectedSkill(Input, self)
-        while not self.acSkill.locked:
-            self.acSkill.update(self.acSkill.avPatterns[0])
-        addAction(self.Turno, selectedSkill, (Input, aChar))
-        self.acSkill = None
+
 
     def draw(self, render):
         render.drawPlaceHolder(self.PlaceHolderColor, self.Posicion[0], self.Posicion[1], 0, 'personaje')
-        if self.acSkill != None:
-            for tile in acSkill.pattern:
-                 render.drawPlaceHolder(self.PlaceHolderColor, tile[0], tile[1])
+
 
 def addAction(aTurno, Clase, Args):
         aTurno.append(Clase(Args))
@@ -193,3 +319,6 @@ class DPS(Personaje):
     def Play(self, PlayAction):
         PlayAction.play(self)
         self.Turno.remove(PlayAction)
+        
+        
+        

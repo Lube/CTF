@@ -32,7 +32,12 @@ class Wait(Action):
     def play(self, aChar):
         aChar.Posicion = self.Pos
 
+class skill(Action):
+    def __init__(self):
+        self.Pos = Pos
 
+    def play(self, aChar):
+        print "el esquilyot esta en", self.pattern
 
 
 
