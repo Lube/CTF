@@ -53,25 +53,28 @@ def main(SoC, IP):
         unSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Bind the socket to the port
         server_address = ('localhost', 10000)
+        print "1"
         if SoC == 'server':
             unSocket.bind(server_address)
             unSocket.listen(1)
-            while True:
-                # Wait for a connection
-                connection, client_address = unSocket.accept()
-                try:
-                    # Receive the data in small chunks and retransmit it
-                    while True:
+            print "2"
+            # Wait for a connection
+            connection, client_address = unSocket.accept()
+            try:
+            # Receive the data in small chunks and retransmit it
+                while True:
                         data = connection.recv(16)
                         print >>sys.stderr, 'received "%s"' % data
                         if data:
                             connection.sendall(data)
                         else:
                             break
-                finally:
+                        data = []
+            finally:
                 # Clean up the connection
-                    connection.close()
+                connection.close()
         if SoC == 'cliente':
+            print "3"
             unSocket.connect(server_address)
             try:
                 # Send data
@@ -174,6 +177,6 @@ def makeText(text, color, bgcolor, top, left):
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1], sys.argv[2])
 
 
