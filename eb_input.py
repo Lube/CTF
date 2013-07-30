@@ -62,7 +62,7 @@ class Input():
                     self.CameraOrder = UP
                 else:
                     self.CameraOrder = None
-        print self.mouse()
+
 
 
     def updateOrder(self):
@@ -101,14 +101,14 @@ class Input():
         COL, FILA = CoordsToTiles(X,Y)
         
         if (COL < 0):
-            COL = None
-            FILA = None
+            COL = COL - 1
+            COL = int(COL)
         else:
             COL = int(COL)
             
         if (FILA < 0):
-            COL = None
-            FILA = None
+            FILA = FILA - 1
+            FILA = int(FILA)
         else:
             FILA = int(FILA)
             

@@ -6,6 +6,7 @@ ATK_SPEED_DPS = 12
 MOV_SPEED_DPS = 8
 DAMAGE_DPS = 8
 HITPOINTS_DPS = 100
+ACTIONPOINTS = 1200
 STATE_WALK = 'walk'
 STATE_FEAR = 'fear'
 STATE_STUN = 'stun'
@@ -13,8 +14,8 @@ STATE_RUN = 'run'
 COST_RUN = 8
 COST_WALK = 5
 COST_WAIT = 10
-WALK_ESC = 0.2
-RUN_ESC = 0.3
+WALK_ESC = 0.1
+RUN_ESC = 0.2
 FASE_P = 'planeamiento'
 FASE_A = 'accion'
 
@@ -51,15 +52,15 @@ class Personaje:
     #MovSpeed
     #Sprite
     #Posicion
-    Estado    = STATE_WALK
+
     PlaceHolderColor = GREEN
     Habilidades = []
-
 
     def __init__(self, AtkSpeed = 10, MovSpeed = 10, Posicion = (5,5)):
             self.AtkSpeed = AtkSpeed
             self.MovSpeed = MovSpeed
             self.Posicion = Posicion
+            self.Estado   = STATE_WALK
                         
     def getPlayAction(self):
         if self.Turno:
@@ -80,7 +81,7 @@ class Personaje:
             self.PlaceHolderColor = RED
         else:
             self.Fase = FASE_P
-            self.ActionPoints = 100
+            self.ActionPoints = ACTIONPOINTS
             self.PlaceHolderColor = GREEN
 
     def update(self, anInput, unMapa):
@@ -111,9 +112,9 @@ class Personaje:
         else:
             Escalar = WALK_ESC
       
-        R =((self.Posicion |x| (Escalar |y| comando)),(0.5,0.5))
+        R =((self.Posicion |x| (Escalar |y| comando)),(0.6,0.6))
         
-        if mapa.rectColission(R):
+        if mapa.rectColission(R, comando):
             return False
         return True
         
@@ -167,12 +168,13 @@ class DPS(Personaje):
     
     
     Fase = FASE_P
-    ActionPoints = 100
+    ActionPoints = ACTIONPOINTS
     
     
     def __init__(self, Posicion = (5,5)):
             self.Posicion = Posicion
             self.Turno = []
+            self.Estado   = STATE_WALK
             #self.Turno.ActionList[-1].addPos((self.Posicion, self.Estado))
     
     

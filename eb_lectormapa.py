@@ -13,6 +13,23 @@ dClavesMapa = {'#':0,
 
 drClavesMapa = {v:k for k, v in dClavesMapa.iteritems()}
 
+BOTRIGHT = 4
+BOTLEFT = 3
+TOPLEFT = 1
+TOPRIGHT = 2
+
+UP, RIGHT, DOWN, LEFT = (1,1), (1,-1), (-1,-1), (-1,1)
+NE, SE, NO, SO = (0,-1), (1,0), (-1,0), (0,1)
+
+dCollision = {NO:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              NE:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              SO:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              SE:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              RIGHT:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              DOWN:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              UP:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT],
+              LEFT:[TOPLEFT, TOPRIGHT, BOTLEFT, BOTRIGHT]}
+
 #           R,    G,    B
 BLACK =     (0  , 0  ,  0  )
 WHITE =     (255, 255,  255)
@@ -41,13 +58,33 @@ class Mapa:
         self.fil = len(self.mapa)
         self.col = len(self.mapa[0])
         
-    def rectColission(self, ((left,top),(width,height   ))):
+    def rectColission(self, ((left,top),(width,height)), comando):
+        VerticesTile = [(left,top),(left+width, top),(left,top+height),(left+width, top+height)]
+        
+        
+        for vertice in dCollision[comando]:
+            x,y = VerticesTile[vertice-1]
+            
+            print x,y
+        
+            if comando[0] != 0:
+                if x > int(x) and self.mapa[int(x)][int(y)] == 1:
+                    return True
+            
+            if comando[1] != 0:
+                if y > int(y) and self.mapa[int(x)][int(y)] == 1:
+                    return True
+        
+        return False
        
-        if self.mapa[int(left)][int(top)] == 1:
+        """if self.mapa[int(left)][int(top)] == 1:
+           #if self.mapa[left][top] == 1:
+           #     return False
+           return True
            # print "TOPLEFT"
            # print "(",left, top,"),"
            # print "(",int(left), int(top),"),"
-            return True
+
         if self.mapa[int(left)][int(top + height)] == 1:
             #print "BOTLEFT"
             #print "(",left,(top + height),")"
@@ -64,7 +101,7 @@ class Mapa:
             #print "(",(left + width),(top + height),")"
             #print "(",int(left + width), int(top + height),")"
             return True
-        return False
+        return False"""
     
 
     def draw(self, render):

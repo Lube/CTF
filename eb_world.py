@@ -32,7 +32,8 @@ GREEN =     (0  , 160,  50 )
 
 def main():
 
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, Input#aSpriteSheet, unMapa, aCamera, tileList, Commands, aChar, command, Collisionables
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, Input
+    #aSpriteSheet, unMapa, aCamera, tileList, Commands, aChar, command, Collisionables
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -87,8 +88,8 @@ def main():
         if CharSelected.Fase == FASE_P:
             CharSelected.update(Input, unMapa)
         
-            
-        
+   
+        #print ((Input.mouse() |x| aCamera.xyTile) |x| (-2,-2))
         """if Input.ChangeSignal and CharSelected.Fase == FASE_P:
             CharSelected.cambiaFase()
             CharSelected = Chars[(Chars.index(CharSelected)+ 1) % len(Chars)]
