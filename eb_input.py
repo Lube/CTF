@@ -27,10 +27,7 @@ class Input():
         self.WalkRun = False
         self.Wait = False
         self.Rotate = False
-<<<<<<< HEAD
-=======
         self.Click = False
->>>>>>> hey yo
 
         for anEvent in pygame.event.get():
             if anEvent.type == pygame.KEYDOWN:
@@ -46,11 +43,8 @@ class Input():
                     self.Wait = True
                 if anEvent.key == K_LCTRL:
                     self.Rotate = True
-<<<<<<< HEAD
-=======
                 if pygame.mouse.get_pressed()[0]:
                     self.Click = True
->>>>>>> hey yo
             if anEvent.type == pygame.KEYUP:
                 if anEvent.key in dKey2Dir.keys():
                     self.remove(dKey2Dir[anEvent.key])
@@ -102,11 +96,6 @@ class Input():
         return len(self.Commands) == 0
 
     def mouse(self):
-<<<<<<< HEAD
-        x, y = pygame.mouse.get_pos()
-        pos = (int(x/(TILEW-(GAPSIZE*BOARDWIDTH))),int(y/(TILEH-(GAPSIZE*BOARDWIDTH))))
-        return pos
-=======
         X, Y = pygame.mouse.get_pos()
         
         COL, FILA = CoordsToTiles(X,Y)
@@ -124,7 +113,6 @@ class Input():
             FILA = int(FILA)
             
         return COL, FILA
->>>>>>> hey yo
 
     def mouseDirection(self, char):
         cX, cY = char.posicion
@@ -141,11 +129,8 @@ class Input():
         else:
             if abs(mY+cY) > abs(cX+mX):
                 self.facing = UP
-<<<<<<< HEAD
-=======
 
 def CoordsToTiles(X,Y):
     FILA = (Y - 32 - (X*TILEH/TILEW) + (HALF*TILEH/TILEW)) / HTILEH / 2
     COL = (X - HALF + (FILA*HTILEW)) / HTILEW
     return COL, FILA
->>>>>>> hey yo
