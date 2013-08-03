@@ -23,7 +23,7 @@ BLACK =     (0  , 0  ,  0  )
 WHITE =     (255, 255,  255)
 GREEN =     (0  , 160,  50 )
 RED   =     (160, 25 ,  25 )
-
+import pygame, math
 from eb_render import Render
 from eb_turno import * #Turno, Action, Movimiento, AutoAtaque
 from eb_lectormapa import Mapa
@@ -105,18 +105,18 @@ class Personaje:
     def canMove(self, mapa, comando):
             #movimiento = AEstrella(mapa, self.Posicion, destino)
         if (self.Estado == STATE_STUN) or (self.Estado == STATE_FEAR):
-            return False, NONE
+            return False
         elif self.Estado == STATE_RUN:
-            if mapa.pos(self.Posicion |x| (RUN_ESC |y| comando)):
-                return True
-            else:
-                return False
+            Escalar = RUN_ESC
         else:
-            if mapa.pos(self.Posicion |x| (WALK_ESC |y| comando)):
-                return True
-            else:
-                return False
-
+            Escalar = WALK_ESC
+      
+        R =((self.Posicion |x| (Escalar |y| comando)),(0.5,0.5))
+        
+        if mapa.rectColission(R):
+            return False
+        return True
+        
     def wait(self):
         addAction(self.Turno, Wait, self.Posicion)
         self.ActionPoints -= COST_WAIT
@@ -127,6 +127,7 @@ class Personaje:
             addAction(self.Turno, Walk, self.Posicion)
         
         self.Posicion = self.Posicion |x| (WALK_ESC |y| comando)
+        self.Posicion = round(self.Posicion[0], 1), round(self.Posicion[1], 1)
         self.ActionPoints -= COST_WALK
             
         addAction(self.Turno, Walk, self.Posicion)
@@ -137,13 +138,15 @@ class Personaje:
             addAction(self.Turno, Run, self.Posicion)
         
         self.Posicion = self.Posicion |x| (RUN_ESC |y| comando)
+        round(self.Posicion[0], 1)
+        round(self.Posicion[1], 1)
         self.ActionPoints -= COST_RUN
             
         addAction(self.Turno, Run, self.Posicion)
     
     
     def draw(self, render):
-        render.drawPlaceHolder(self.PlaceHolderColor, self.Posicion[0], self.Posicion[1])
+        render.drawPlaceHolder(self.PlaceHolderColor, self.Posicion[0], self.Posicion[1], 0, 'personaje')
 
 
 def addAction(aTurno, Clase, Args):

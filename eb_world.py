@@ -17,7 +17,7 @@ dFACINGS = {RIGHT:0, DOWN:1, NE:6, NO:3 ,UP:4 ,SE:5 ,SO:2 ,LEFT:7}
 #NONE = (0,0)
 FPS = 30
 
-WINDOWWIDTH, WINDOWHEIGHT = 600, 400
+WINDOWWIDTH, WINDOWHEIGHT = 800, 600
 TILEH, TILEW, GAPSIZE = 32, 64, 1
 BOARDWIDTH = 15
 HALF = WINDOWWIDTH / 2
@@ -43,7 +43,7 @@ def main():
 
 #------------------------------------------------
     Chars = []
-    Chars.append(DPS((1,1)))
+    Chars.append(DPS((7,6)))
     Chars.append(DPS((3,3)))
     CharSelected = Chars[0]
     #--------------------------
@@ -52,12 +52,25 @@ def main():
     aRender = Render(aCamera, DISPLAYSURF)
 
     while not Input.Quit:
+<<<<<<< HEAD
+=======
+        
+        
+        #print aChar.pos
+>>>>>>> hey yo
         DISPLAYSURF.fill((0,0,0))
         unMapa.draw(aRender)
         for char in Chars:
             char.draw(aRender)
         Input.update()
+<<<<<<< HEAD
 
+=======
+        if Input.CameraOrder != None:
+            aCamera.update(aCamera.xyTile |x| Input.CameraOrder)
+        #CharSelected.update()
+        
+>>>>>>> hey yo
         if CharSelected.Fase == FASE_A:
             CharSelected = Chars[(Chars.index(CharSelected)+ 1) % len(Chars)]
 
