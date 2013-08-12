@@ -12,6 +12,7 @@ ATK_SPEED_DPS = 12
 MOV_SPEED_DPS = 8
 DAMAGE_DPS = 8
 HITPOINTS_DPS = 100
+ACTIONPOINTS = 100
 STATE_WALK = 'walk'
 STATE_FEAR = 'fear'
 STATE_STUN = 'stun'
@@ -19,7 +20,7 @@ STATE_RUN = 'run'
 COST_RUN = 8
 COST_WALK = 5
 COST_WAIT = 10
-COST_SKILLS = [50,50,50,50]
+COST_SKILL = 50
 WALK_ESC = 0.2
 RUN_ESC = 0.3
 FASE_P = 'planeamiento'
@@ -57,140 +58,17 @@ x = Infix(lambda a,b:tuple([x+y for x, y in zip(a, b)]))
 y = Infix(lambda a,b:tuple([a*y for y in b]))
 
 
+sign = lambda x: 0 if x == 0 else math.copysign(1, x)
 
 
 
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-
-
-
-
-
-class skillshot():
-    """Ataques"""
-    efRate = 0 #rango de efectividad TOTAL (se divide por la cantidad de tiles)
-    disRate = 0 #Cuantos tiles ocupa
-    Pattern = [] #En que forma se castea
-    avPatterns = [] #Patterns disponibles
-    locked = False #estado del skillshot, si locked significa que se ejecuta el pr?ximo turno.
-    PlaceHolderColor = RED
-    def __init__(self, Input, aChar):
-        """inicializar dandole efRate, disRate y avPatterns"""
-        self.Input = Input
-        self.mouse = Input.mouse()
-        self.char = aChar
-        self.facing = Input.mouseDirection(self.char)
-
-        
-    def update(self, pattern):
-        self.Pattern = []
-        if self.mouse == (None, None):
-            self.mouse = (0,0)
-        """pseudo-interfaz del skillshot, event handling"""
-        prev = (0,0)
-        self.facing = self.Input.mouseDirection(self.char)
-        if self.Input.Rotate:
-            #si se toca L_ctrl se gira el skillshot
-            self.rotate()
-
-        if pattern == LINE:
-            #Generar el pattern lineal
-            for i in range(self.disRate):
-                prev= tuple(map(sum, zip(prev, self.facing)))
-                self.Pattern.append(prev)
-
-        if pattern == SQR:
-            #Generar el pattern rectangular
-            """prev = self.Input.mouse()
-            for i in range(self.disRate/2):
-                prev = prev |x| self.facing
-                self.Pattern.append(prev)
-               # print self.Pattern
-            acPattern = self.Pattern
-            for q,y in acPattern:
-                if self.facing in (RIGHT, LEFT):
-                    self.Pattern.append((q,y+1))
-                if self.facing in (UP, DOWN"""
-            self.Pattern.append(self.Input.mouse())
-
-        if self.Input.Click:
-            #Si clickea se confirma el movimiento
-            self.locked = True
-       
-
-
-    def rotate(self):
-        """rotar """
-        if self.facing == RIGHT:
-            self.facing = DOWN
-        if self.facing == DOWN:
-            self.facing = LEFT
-        if self.facing == LEFT:
-            self.facing = UP
-        if self.facing == UP:
-            self.facing = RIGHT
-
-    def draw(self, render):
-        for tile in self.pattern:
-            render.drawPlaceHolder(self.PlaceHolderColor, tile[0], tile[1])
-
-
-class Ray(skillshot):
-    efRate = 100
-    disRate = 4
-    avPatterns = [LINE]
-    pattern = LINE
-
-    def play(self):
-        self.update(pattern, Input)
-
-class Blast(skillshot):
-    efRate = 100
-    disRate = 6
-    avPatterns = [SQR]
-
-    def play(self, aChar):
-        self.update(pattern, Input)
-
-
-
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-
-
-
-class Personaje:
-    #AtkSpeed
-    #MovSpeed
-    #Sprite
-    #Posicion
+class Personaje(object):
     Estado    = STATE_WALK
     PlaceHolderColor = GREEN
     Habilidades = []
-
-
-    def __init__(self, AtkSpeed = 10, MovSpeed = 10, Posicion = (5,5)):
-            self.AtkSpeed = AtkSpeed
-            self.MovSpeed = MovSpeed
-            self.Posicion = Posicion
-            self.acSkill  = None
+    
+    def __init(self):
+        pass
 
     def getPlayAction(self):
         if self.Turno:
@@ -211,10 +89,20 @@ class Personaje:
             self.PlaceHolderColor = RED
         else:
             self.Fase = FASE_P
-            self.ActionPoints = 100
+            self.ActionPoints = ACTIONPOINTS
             self.PlaceHolderColor = GREEN
 
-    def update(self, anInput, unMapa):
+    def update(self, anInput, unMapa, aCamera):
+        
+        if anInput.nSkill != None:
+            self.acSkill = Skillshot((self.Posicion, (anInput.realTileMouse() |x| aCamera.xyTile)))
+
+        if self.acSkill != None:
+            self.acSkill.update(self.Posicion, (anInput.realTileMouse() |x| aCamera.xyTile))
+            if anInput.Click:
+                self.Turno.append(self.acSkill)
+                self.acSkill = None
+            
         if self.ActionPoints <= 0 or anInput.ChangeSignal:
                 self.cambiaFase()
 
@@ -227,17 +115,34 @@ class Personaje:
                     self.walk(anInput.Order)
                 elif self.Estado == STATE_RUN:
                     self.run(anInput.Order)
-
+                
         if anInput.Wait:
             self.wait()
 
-        if anInput.nSkill != None:
-            self.skill(anInput.nSkill, anInput)
-
-                    
-
-
-
+    def getTurnStringInfo(self):
+        toSend = ''
+        for Action in self.Turno:
+            toSend = toSend + Action.getStringInfo()
+        toSend = toSend[:-1]
+        
+        return toSend
+            
+    def buildTurnFromString(self, Data):
+        Turno = Data.split('|')
+        for Action in Turno:
+            RawAction = Action.split(',')
+            if RawAction[0] == 'Walk':
+                addAction(self.Turno, Walk, (float(RawAction[1]),float(RawAction[2])))
+            elif RawAction[0] == 'Run':
+                addAction(self.Turno, Run, (float(RawAction[1]),float(RawAction[2])))
+            elif RawAction[0] == 'Wait':
+                addAction(self.Turno, Wait, (float(RawAction[1]),float(RawAction[2])))
+            elif RawAction[0] == 'Skillshot':
+                addAction(self.Turno, Skillshot, ((float(RawAction[1]),float(RawAction[2])),\
+                                                  (float(RawAction[3]),float(RawAction[4]))))
+            else:
+                pass        
+    
 
     def canMove(self, mapa, comando):
         if (self.Estado == STATE_STUN) or (self.Estado == STATE_FEAR):
@@ -259,33 +164,34 @@ class Personaje:
 
 
     def walk(self, comando):
-        if not self.Turno or not sameLastAction(self.Turno, Walk):
-            addAction(self.Turno, Walk, self.Posicion)
+        #if not self.Turno or not sameLastAction(self.Turno, Walk): #wtf?
+        #    addAction(self.Turno, Walk, self.Posicion)
 
         self.Posicion = self.Posicion |x| (WALK_ESC |y| comando)
         self.Posicion = round(self.Posicion[0], 1), round(self.Posicion[1], 1)
         self.ActionPoints -= COST_WALK
+        self.HitBox.update(self.Posicion)
+
 
         addAction(self.Turno, Walk, self.Posicion)
 
 
     def run(self, comando):
-        if not self.Turno or not sameLastAction(self.Turno, Run):
-            addAction(self.Turno, Run, self.Posicion)
+        #if not self.Turno or not sameLastAction(self.Turno, Run):
+        #    addAction(self.Turno, Run, self.Posicion)
 
         self.Posicion = self.Posicion |x| (RUN_ESC |y| comando)
         round(self.Posicion[0], 1)
         round(self.Posicion[1], 1)
         self.ActionPoints -= COST_RUN
+        self.HitBox.update(self.Posicion)
+
 
         addAction(self.Turno, Run, self.Posicion)
-
-    def skill(self, nSkill, Input):
-        selectedSkill = self.avSkills[nSkill]
-        self.ActionPoints -= COST_SKILLS[nSkill]
-        self.acSkill = selectedSkill(Input, self)
-
-
+    
+    def gotHit(self, anAction):
+        return self.HitBox.collideHitBox(anAction.HitBox)
+    
     def draw(self, render):
         render.drawPlaceHolder(self.PlaceHolderColor, self.Posicion[0], self.Posicion[1], 0, 'personaje')
 
@@ -305,14 +211,13 @@ class DPS(Personaje):
     MovSpeed = MOV_SPEED_DPS
     Damage   = DAMAGE_DPS
     HitPoints = HITPOINTS_DPS
-    avSkills = [Ray, Blast]
     acSkill = None
     Fase = FASE_P
-    ActionPoints = 100
-
+    ActionPoints = ACTIONPOINTS
 
     def __init__(self, Posicion = (5,5)):
             self.Posicion = Posicion
+            self.HitBox = HitBox(self.Posicion, (0.5,0.5))
             self.Turno = []
 
 
@@ -321,4 +226,9 @@ class DPS(Personaje):
         self.Turno.remove(PlayAction)
         
         
-        
+    def getStringInfo(self):
+        Info = ''
+        Info = self.__class__.__name__
+        Info = Info + ',' + str(self.Posicion[0]) + ',' + str(self.Posicion[1])
+    
+        return Info, len(Info)

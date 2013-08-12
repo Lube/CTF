@@ -1,4 +1,6 @@
-import random, pygame, sys
+import random, pygame, sys, functools
+from aStar import *
+
 
 STONE_M = 0
 STONE_COR = 1
@@ -20,8 +22,8 @@ class oMap():
         """junta las 4 partes del mapa, las convierte en string y guarda en
         unmapa.txt """
         self.size = size
-        top = []
-        bot = []
+        self.top = []
+        self.bot = []
         #Divide el mapa en 4 partes y genera cada parte
         topLeft = partsFactory.getPart(self)
         topRight = partsFactory.getPart(self)
@@ -29,20 +31,26 @@ class oMap():
         botRight = partsFactory.getPart(self)
         #separa el mapa en top y bot
         for column in range(len(topLeft)):
-            top.append(topLeft[column]+topRight[column])
+            self.top.append(topLeft[column]+topRight[column])
         for column in range(len(botLeft)):
-            bot.append(botLeft[column]+botRight[column])
-        self.mapList = top+bot
-        #le pone bordes horizontales
-        self.borders()
-        #y verticales
+            self.bot.append(botLeft[column]+botRight[column])
+        #Crea puntos de respawn con los car?cteres R y B
+        self.mapList = self.top+self.bot
+        #le pone bordes
+        self.borders()        
+        self.checkForIslas()
+        print 'empieza flags'
+        self.flags()
+        print 'termina flags empieza rP'
+        self.respawnPoints()
+        print 'sin bugs'
         #lo transforma en string
         for column in self.mapList:
             for tile in column:
                 self.Map+= tile
             self.Map+='\n'
         #lo guarda en el archivo.
-        readableMap = open('unmapa.txt', 'a')
+        readableMap = open('unmapa.txt', 'w')
         readableMap.write(self.Map)
         readableMap.close()
 
@@ -84,6 +92,64 @@ class oMap():
                 column[-3:] = ['0','0','0']
             finalMap.append(column)
         self.mapList = finalMap
+
+    def respawnPoints(self):
+        """Crea los puntos de respawn de los dos equipos"""
+        for a in range(2):
+            bordes= [5,15] if a == 0 else [45,55]
+            y = random.randint(bordes[0],bordes[1])
+
+            x = random.randint(5,55)
+            while not self.freeSpace(y,x):
+                print 'Entro en 1 loop RP'
+                x = random.randint(5,55)
+            self.mapList[y][x] = 'R' if a == 0 else 'B'
+
+
+    def flags(self):
+        """crea 3 puntos de captura"""
+        allFlagsY = [10, 25, 40]
+        for line in allFlagsY:
+            while True:
+                print 'Entro en 1 loop flags'
+                x = random.randint(5,55)
+                if self.freeSpace(line, x):
+                    self.mapList[line][x] = 'P'
+                    break
+
+    def freeSpace(self, x, y):
+        if self.mapList[x][y] == '#':
+            return True
+        return False
+    
+    def checkForIslas(self):
+        for x in range(60):
+            for y in range(60):
+                if self.mapList[x][y] == '#':
+                    print x,y
+                    if not aStar(self.mapList, (x,y), (30,30)):
+                        print "A"
+                        self.mapList[x][y] = '0'        
+
+    def delIsles(self):
+        corners = [(5,5),(55,5),(5,55),(55,55)]
+        for x,y in corners:
+            if not self.freeSpace(x,y):
+                corners.remove((x,y))
+                corners.append((self.mapList[y].index('#'), y))
+        z = 0
+        for line in range(2,len(self.mapList)-2):
+            z += 1
+            print z
+            for tile in range(2,len(self.mapList[line])-2):
+                if self.mapList[line][tile] == '#':
+                    for cor in corners:
+                        AE = AEstrella(self.mapList, (tile, line), cor)
+                        self.mapList[line][tile] = '#'
+                        self.mapList[cor[1]][cor[0]] = '#'
+                        if AE.camino == None:
+                            self.mapList[line][tile] = '0'
+                    print tile
 
 class factory(object):
 
@@ -203,9 +269,12 @@ class stoneMu(stone):
         self.width = width
         self.center = center
 
+
+
+
 partsFactory = factory()
 
 
-
+mapa = oMap()
 
 

@@ -1,0 +1,38 @@
+        #self.facing = self.Input.mouseDirection(self.char)
+        #if self.Input.Rotate:
+            #si se toca L_ctrl se gira el skillshot
+        #    self.rotate()
+
+        #if pattern == LINE:
+            #Generar el pattern lineal
+         #   for i in range(self.disRate):
+          #      prev= tuple(map(sum, zip(prev, self.facing)))
+           #     self.Pattern.append(prev)
+
+        #if pattern == SQR:
+            #Generar el pattern rectangular
+        #    """prev = self.Input.mouse()
+        #    for i in range(self.disRate/2):
+        #        prev = prev |x| self.facing
+        #        self.Pattern.append(prev)
+        #       # print self.Pattern
+         #   acPattern = self.Pattern
+          #  for q,y in acPattern:
+           #     if self.facing in (RIGHT, LEFT):
+            #        self.Pattern.append((q,y+1))
+             #   if self.facing in (UP, DOWN"""
+            #self.Pattern.append(self.Input.mouse())
+
+
+        self.facing = Input.mouseDirection(self.char)
+
+    def rotate(self):
+        """rotar """
+        if self.facing == RIGHT:
+            self.facing = DOWN
+        if self.facing == DOWN:
+            self.facing = LEFT
+        if self.facing == LEFT:
+            self.facing = UP
+        if self.facing == UP:
+            self.facing = RIGHT
